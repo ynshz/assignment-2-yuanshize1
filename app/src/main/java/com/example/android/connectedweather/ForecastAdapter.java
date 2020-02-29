@@ -6,70 +6,73 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
 
-public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastItemViewHolder> {
+public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.SearchResultView> {
 
-    private ArrayList<String> mForecastData;
-    private ArrayList<String> mDetailedForecastData;
-    private OnForecastItemClickListener mOnForecastItemClickListener;
+    private WeatherUtils.WeatherRepo[] mRepos;
+    OnSearchItemClickListener mSearchItemClickListener;
 
-
-
-
-    public ForecastAdapter(OnForecastItemClickListener onForecastItemClickListener) {
-        mOnForecastItemClickListener = onForecastItemClickListener;
+    public interface OnSearchItemClickListener {
+        void onSearchItemClick(WeatherUtils.WeatherRepo repo);
     }
 
-    public void updateForecastData(ArrayList<String> forecastData, ArrayList<String> detailedForecastData) {
-        mForecastData = forecastData;
-        mDetailedForecastData = detailedForecastData;
+    ForecastAdapter(OnSearchItemClickListener searchItemClickListener) {
+        mSearchItemClickListener = searchItemClickListener;
+    }
+
+    public void updateSearchResults(WeatherUtils.WeatherRepo[] repos) {
+        mRepos = repos;
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        if (mForecastData != null && mDetailedForecastData != null) {
-            return Math.min(mForecastData.size(), mDetailedForecastData.size());
+        if (mRepos  != null) {
+            return mRepos .length;
         } else {
             return 0;
         }
     }
 
+    @NonNull
     @Override
-    public ForecastItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SearchResultView  onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.forecast_list_item, parent, false);
-        return new ForecastItemViewHolder(view);
+        View view = inflater.inflate(R.layout.search_result, parent, false);
+        return new SearchResultView(view);
     }
 
     @Override
-    public void onBindViewHolder(ForecastItemViewHolder holder, int position) {
-        holder.bind(mForecastData.get(position));
+    public void onBindViewHolder(@NonNull SearchResultView holder, int position) {
+        holder.bind(mRepos[position]);
     }
 
-    public interface OnForecastItemClickListener {
-        void onForecastItemClick(String detailedForecast);
-    }
 
-    class ForecastItemViewHolder extends RecyclerView.ViewHolder {
-        private TextView mForecastTextView;
+    class SearchResultView extends RecyclerView.ViewHolder {
+        private TextView mSearchResultTV;
 
-        public ForecastItemViewHolder(View itemView) {
+        public SearchResultView(View itemView) {
             super(itemView);
-            mForecastTextView = itemView.findViewById(R.id.tv_forecast_text);
+            mSearchResultTV  = itemView.findViewById(R.id.tv_search_result);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String detailedForecast = mDetailedForecastData.get(getAdapterPosition());
-                    mOnForecastItemClickListener.onForecastItemClick(detailedForecast);
+                    WeatherUtils.WeatherRepo searchResult = mRepos[getAdapterPosition()];
+                    mSearchItemClickListener.onSearchItemClick(searchResult);
                 }
             });
         }
 
-        public void bind(String forecast) {
-            mForecastTextView.setText(forecast);
+        public void bind(WeatherUtils.WeatherRepo repo) {
+            double main = Double.parseDouble(repo.main.temp) - 273.15;
+            main = (main * 9/5) + 32;
+            String temp =  String.valueOf((int)main);
+
+            String text = repo.dt_txt + " - " + repo.weather[0].main + " - "
+                    + temp + " F";
+            mSearchResultTV.setText(text);
         }
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Connected Weather</string>
+    <string name="share_repo_text">%1$s: %2$s</string>
 </resources>

@@ -6,9 +6,32 @@
     android:layout_height="match_parent"
     tools:context="com.example.android.connectedweather.MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_forecast_list"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_forecast_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_loading_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:visibility="invisible"
+            android:text="We were unable to execute your query.  Check your internet connection." />
+
+        <ProgressBar
+            android:id="@+id/pb_loading"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="32dp"
+            android:visibility="invisible"/>
+    </FrameLayout>
+
 
 </LinearLayout>
